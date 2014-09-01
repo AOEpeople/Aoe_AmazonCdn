@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+    <global>
+        <models>
+            <aoe_amazoncdn>
+                <class>Aoe_AmazonCdn_Model</class>
+            </aoe_amazoncdn>
+            <cms><!-- cms/wysiwyg_images_storage => Aoe_AmazonCdn_Model_Storage -->
+                <rewrite>
+                    <wysiwyg_images_storage>Aoe_AmazonCdn_Model_Storage</wysiwyg_images_storage>
+                </rewrite>
+            </cms>
+        </models>
+
+        <helpers>
+            <aoe_amazoncdn>
+                <class>Aoe_AmazonCdn_Helper</class>
+            </aoe_amazoncdn>
+        </helpers>
+
+        <blocks>
+            <aoe_amazoncdn>
+                <class>Aoe_AmazonCdn_Block</class>
+            </aoe_amazoncdn>
+            <cms>
+                <rewrite>
+                    <block>Aoe_AmazonCdn_Block_Block</block>
+                    <page>Aoe_AmazonCdn_Block_Page</page>
+                </rewrite>
+            </cms>
+            <enterprise_banner>
+                <rewrite>
+                    <widget_banner>Aoe_AmazonCdn_Block_Widget_Banner</widget_banner>
+                </rewrite>
+            </enterprise_banner>
+        </blocks>
+    </global>
+</config>
