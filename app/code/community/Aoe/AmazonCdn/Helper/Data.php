@@ -75,7 +75,7 @@ class Aoe_AmazonCdn_Helper_Data extends Mage_Core_Helper_Abstract
             $adapterWrapper = $adapter->auth();
 
             if ($adapterWrapper === false) {
-                Mage::log("Can not connect to the bucket:" . $this->getAmazonS3BucketName(), Zend_Log::ERR);
+                OnePica_ImageCdn_Helper_Data::log("Can not connect to the bucket:" . $this->getAmazonS3BucketName(), Zend_Log::ERR);
             } else {
                 return $adapterWrapper;
             }
@@ -166,15 +166,15 @@ class Aoe_AmazonCdn_Helper_Data extends Mage_Core_Helper_Abstract
                     if (!is_dir($directoryName)) {
                         $res = $io->mkdir($directoryName);
                         if ($res) {
-                            Mage::log('Successfully created dir ' . $directoryName, Zend_Log::DEBUG);
+                            OnePica_ImageCdn_Helper_Data::log('Successfully created dir ' . $directoryName, Zend_Log::DEBUG);
                         } else {
-                            Mage::log('Error while creating dir ' . $directoryName, Zend_Log::ERR);
+                            OnePica_ImageCdn_Helper_Data::log('Error while creating dir ' . $directoryName, Zend_Log::ERR);
                         }
                     }
                     if (!is_file($targetFile)) {
                         $adapterWrapper->downloadFile($bucketName, $s3fileName, $targetFile);
                         $downloadedFiles[] = $s3fileName;
-                        Mage::log(sprintf("Downloading file %s"), $targetFile, Zend_Log::DEBUG);
+                        OnePica_ImageCdn_Helper_Data::log(sprintf("Downloading file %s"), $targetFile, Zend_Log::DEBUG);
                     }
                 }
             }
@@ -221,15 +221,15 @@ class Aoe_AmazonCdn_Helper_Data extends Mage_Core_Helper_Abstract
             if (is_file($localFile)) {
                 $url = $this->storeInCdn($localFile);
                 if ($url) {
-                    Mage::log(
+                    OnePica_ImageCdn_Helper_Data::log(
                         sprintf('Copied previously uploaded wysiwyg file "%s" to cdn. Url "%s"', $localFile, $url),
                         Zend_Log::DEBUG
                     );
                 } else {
-                    Mage::log(sprintf('Did not copy uploaded wysiwyg file "%s" to cdn.', $localFile), Zend_Log::ERR);
+                    OnePica_ImageCdn_Helper_Data::log(sprintf('Did not copy uploaded wysiwyg file "%s" to cdn.', $localFile), Zend_Log::ERR);
                 }
             } else {
-                Mage::log(sprintf('Could not find file "%s", neither local nor in cdn', $relative), Zend_Log::ERR);
+                OnePica_ImageCdn_Helper_Data::log(sprintf('Could not find file "%s", neither local nor in cdn', $relative), Zend_Log::ERR);
             }
         }
 

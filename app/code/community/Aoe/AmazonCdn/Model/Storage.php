@@ -12,7 +12,7 @@ class Aoe_AmazonCdn_Model_Storage extends Mage_Cms_Model_Wysiwyg_Images_Storage
      */
     protected function _construct()
     {
-        $cacheKey     = self::CACHE_KEY_PREFIX_WYSIWYG . $_SERVER['SERVER_ADDR'];
+        $cacheKey     = self::CACHE_KEY_PREFIX_WYSIWYG . Mage::app()->getRequest()->getServer('SERVER_ADDR');
         $lastSyncTime = (int)Mage::app()->loadCache($cacheKey);
 
         if (time() - $lastSyncTime > 120) {
@@ -45,9 +45,9 @@ class Aoe_AmazonCdn_Model_Storage extends Mage_Cms_Model_Wysiwyg_Images_Storage
         $helper = Mage::helper('aoe_amazoncdn');
         $url = $helper->storeInCdn($path);
         if ($url) {
-            Mage::log(sprintf('Copied uploaded wysiwyg file "%s" to cdn. Url "%s"', $path, $url), Zend_Log::DEBUG);
+            OnePica_ImageCdn_Helper_Data::log(sprintf('Copied uploaded wysiwyg file "%s" to cdn. Url "%s"', $path, $url), Zend_Log::DEBUG);
         } else {
-            Mage::log(sprintf('Did not copy uploaded wysiwyg file "%s" to cdn.', $path), Zend_Log::ERR);
+            OnePica_ImageCdn_Helper_Data::log(sprintf('Did not copy uploaded wysiwyg file "%s" to cdn.', $path), Zend_Log::ERR);
         }
 
         return $result;
