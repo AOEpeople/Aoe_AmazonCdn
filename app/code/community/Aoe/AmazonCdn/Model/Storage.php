@@ -19,7 +19,7 @@ class Aoe_AmazonCdn_Model_Storage extends Mage_Cms_Model_Wysiwyg_Images_Storage
             /* @var $helper Aoe_AmazonCdn_Helper_Data */
             $helper = Mage::helper('aoe_amazoncdn');
             $helper->downloadFolders(
-                array('wysiwyg/' => Mage::helper('cms/wysiwyg_images')->getStorageRoot())
+                array('media/wysiwyg/' => Mage::helper('cms/wysiwyg_images')->getStorageRoot())
             );
             Mage::app()->saveCache(time(), $cacheKey);
         }
