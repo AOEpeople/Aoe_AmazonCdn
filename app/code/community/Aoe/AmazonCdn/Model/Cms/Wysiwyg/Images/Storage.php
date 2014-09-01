@@ -1,6 +1,6 @@
 <?php
 
-class Aoe_AmazonCdn_Model_Storage extends Mage_Cms_Model_Wysiwyg_Images_Storage
+class Aoe_AmazonCdn_Model_Cms_Wysiwyg_Images_Storage extends Mage_Cms_Model_Wysiwyg_Images_Storage
 {
     /**
      * WYSIWYG cache key prefix

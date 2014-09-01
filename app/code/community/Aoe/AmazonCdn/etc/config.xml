@@ -5,9 +5,9 @@
             <aoe_amazoncdn>
                 <class>Aoe_AmazonCdn_Model</class>
             </aoe_amazoncdn>
-            <cms><!-- cms/wysiwyg_images_storage => Aoe_AmazonCdn_Model_Storage -->
+            <cms>
                 <rewrite>
-                    <wysiwyg_images_storage>Aoe_AmazonCdn_Model_Storage</wysiwyg_images_storage>
+                    <wysiwyg_images_storage>Aoe_AmazonCdn_Model_Cms_Wysiwyg_Images_Storage</wysiwyg_images_storage>
                 </rewrite>
             </cms>
         </models>
