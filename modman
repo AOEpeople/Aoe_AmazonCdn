@@ -1,2 +1,5 @@
 app/etc/modules/Aoe_AmazonCdn.xml             app/etc/modules/Aoe_AmazonCdn.xml
 app/code/community/Aoe/AmazonCdn/             app/code/community/Aoe/AmazonCdn/
+
+# fixing bug in core
+app/code/community/Varien/Io/File.php       app/code/community/Varien/Io/File.php
