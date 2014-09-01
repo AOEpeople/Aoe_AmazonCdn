@@ -174,7 +174,7 @@ class Aoe_AmazonCdn_Helper_Data extends Mage_Core_Helper_Abstract
                     if (!is_file($targetFile)) {
                         $adapterWrapper->downloadFile($bucketName, $s3fileName, $targetFile);
                         $downloadedFiles[] = $s3fileName;
-                        OnePica_ImageCdn_Helper_Data::log(sprintf("Downloading file %s"), $targetFile, Zend_Log::DEBUG);
+                        OnePica_ImageCdn_Helper_Data::log('Downloading file ' . $targetFile, Zend_Log::DEBUG);
                     }
                 }
             }
