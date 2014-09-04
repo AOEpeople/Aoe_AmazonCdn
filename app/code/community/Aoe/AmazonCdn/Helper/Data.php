@@ -1,186 +1,166 @@
 <?php
+/**
+ * @author Dmytro Zavalkin <dmytro.zavalkin@aoe.com>
+ */
 
 class Aoe_AmazonCdn_Helper_Data extends Mage_Core_Helper_Abstract
 {
-    /**
-     * OnePica_ImageCdn Amazon S3 bucket name config key
-     */
-    const XPATH_CONFIG_AMAZON_S3_BUCKET_NAME = 'imagecdn/amazons3/bucket';
-
-    /**
-     * @var OnePica_ImageCdn_Model_Adapter_AmazonS3
-     */
-    protected $adapter;
-
-    /**
-     * Get Amazon S3 bucket name from the OnePica_ImageCdn settings
+    /**@+
+     * Config paths to retrieve Aoe_AmazonCdn settings
      *
-     * @param mixed $store
-     * @return string
+     * @var string
      */
-    public function getAmazonS3BucketName($store = null)
-    {
-        return (string)Mage::getStoreConfig(self::XPATH_CONFIG_AMAZON_S3_BUCKET_NAME, $store);
-    }
+    const XPATH_CONFIG_IS_ENABLED        = 'aoe_amazoncdn/general/is_enabled';
+    const XPATH_CONFIG_CACHE_CHECK_SIZE  = 'aoe_amazoncdn/general/cache_check_size';
+    const XPATH_CONFIG_CACHE_TTL         = 'aoe_amazoncdn/general/cache_ttl';
+    const XPATH_CONFIG_COMPRESSION       = 'aoe_amazoncdn/general/compression';
+    const XPATH_CONFIG_DEBUG_MODE        = 'aoe_amazoncdn/general/debug_mode';
+    const XPATH_CONFIG_BUCKET_NAME       = 'aoe_amazoncdn/amazons3/bucket';
+    const XPATH_CONFIG_ACCESS_KEY_ID     = 'aoe_amazoncdn/amazons3/access_key_id';
+    const XPATH_CONFIG_SECRET_ACCESS_KEY = 'aoe_amazoncdn/amazons3/secret_access_key';
+    /**@-*/
 
     /**
-     * Get Amazon S3 CDN adapter (from OnePica_ImageCdn)
-     * Requires module OnePica_ImageCdn to be available and enabled.
-     * Amazon S3 CDN should be selected in the OnePica_ImageCdn settings and Use CDN .
+     * General on/off switcher
      *
-     * @return false|OnePica_ImageCdn_Model_Adapter_AmazonS3
+     * @var bool
      */
-    public function getAdapter()
-    {
-        if (is_null($this->adapter)) {
-            $this->adapter = false;
-            if ($this->isModuleEnabled('OnePica_ImageCdn')) {
-                /* @var $imageCdnHelper OnePica_ImageCdn_Helper_Data */
-                $imageCdnHelper = Mage::helper('imagecdn');
-                /* @var $adapter OnePica_ImageCdn_Model_Adapter_Abstract */
-                $adapter = $imageCdnHelper->factory();
-                if ($adapter instanceof OnePica_ImageCdn_Model_Adapter_AmazonS3) {
-                    $this->adapter = $adapter;
-                }
-            }
-        }
-
-        return $this->adapter;
-    }
+    protected $_isEnabled;
 
     /**
-     * Clears css/js cache in S3 bucket
+     * Is CDN integration enabled and bucket credentials are configured properly
+     *
+     * @var bool
+     */
+    protected $_isConfigured;
+
+    /**
+     * Image compression level (1-9) for jpeg/png images
+     *
+     * @var int
+     */
+    protected $_compression;
+
+    /**
+     * Logger instance
+     *
+     * @var Aoe_AmazonCdn_Helper_Logger
+     */
+    protected $_logger;
+
+    /**
+     * Amazon CDN adapter instance
+     *
+     * @var Aoe_AmazonCdn_Model_Cdn_Adapter
+     */
+    protected $_cdnAdapter;
+
+    /**
+     * Get cache facade instance
+     *
+     * @var Aoe_AmazonCdn_Model_Cache_Facade
+     */
+    protected $_cacheFacade;
+
+    /**
+     * Check if extension is enabled
      *
      * @return bool
      */
-    public function clearCssJsCache()
+    public function isEnabled()
     {
-        $adapter = $this->getAdapter();
-        if ($adapter) {
-            return $adapter->clearCssJsCache();
+        if ($this->_isEnabled === null) {
+            $this->_isEnabled = Mage::getStoreConfigFlag(self::XPATH_CONFIG_IS_ENABLED);
         }
 
-        return false;
+        return $this->_isEnabled;
     }
 
     /**
-     * Get Amazon S3 adapter wrapper
+     * Check if CDN integration is enabled and bucket credentials are configured properly
      *
-     * @return false|OnePica_ImageCdn_Model_Adapter_AmazonS3_Wrapper
+     * @return bool
      */
-    public function getAdapterWrapper()
+    public function isConfigured()
     {
-        $adapter = $this->getAdapter();
-        if ($adapter) {
-            $adapterWrapper = $adapter->auth();
-
-            if ($adapterWrapper === false) {
-                OnePica_ImageCdn_Helper_Data::log("Can not connect to the bucket:" . $this->getAmazonS3BucketName(), Zend_Log::ERR);
+        if ($this->_isConfigured === null) {
+            if ($this->isEnabled()) {
+                $this->_isConfigured = false;
+                try {
+                    $this->getCdnAdapter();
+                    $this->_isConfigured = true;
+                } catch (Exception $e) {}
             } else {
-                return $adapterWrapper;
+                $this->_isConfigured = false;
             }
         }
 
-        return false;
+        return $this->_isConfigured;
     }
 
     /**
-     * Checks if a given path is available in the cdn and returns the url
+     * Check if extension is enabled
      *
-     * @param string $filename
-     * @return false|string cdn url or false if no cdn is available
+     * @return bool
      */
-    public function getCdnUrl($filename)
+    public function getCompression()
     {
-        $cdnUrl     = false;
-        $cdnAdapter = $this->getAdapter();
-        if ($cdnAdapter && $cdnAdapter->useCdn() && Mage::getSingleton('imagecdn/cache_facade')->get($filename)) {
-            $cdnUrl = $cdnAdapter->getUrl($filename);
+        if ($this->_compression === null) {
+            $this->_compression = (int)Mage::getStoreConfig(self::XPATH_CONFIG_COMPRESSION);
         }
 
-        return $cdnUrl;
+        return $this->_compression;
     }
 
     /**
-     * Stores file in cdn and return the cdn url
+     * Get logger
      *
-     * @param string $filename
-     * @param string $tempFile
-     * @return false|string cdn url or false if no cdn is available
+     * @return Aoe_AmazonCdn_Helper_Logger
      */
-    public function storeInCdn($filename, $tempFile = null)
+    public function getLogger()
     {
-        $cdnUrl  = false;
-        $adapter = $this->getAdapter();
-        if ($adapter) {
-            if ($tempFile == null) {
-                $tempFile = $filename;
-            }
-
-            $adapter->save($filename, $tempFile);
-            $cdnUrl = $adapter->getUrl($filename);
+        if ($this->_logger === null) {
+            $debugMode     = Mage::getStoreConfigFlag(self::XPATH_CONFIG_DEBUG_MODE);
+            $this->_logger = new Aoe_AmazonCdn_Helper_Logger($debugMode);
         }
 
-        return $cdnUrl;
+        return $this->_logger;
     }
 
     /**
-     * Syncs file from a Amazon S3 bucket to the local file system
+     * Get cache facade instance
      *
-     * @param array $pathMapping array(<prefix> => <localPath>,...)
+     * @return Aoe_AmazonCdn_Model_Cache_Facade
      */
-    public function downloadFolders(array $pathMapping)
+    public function getCacheFacade()
     {
-        $adapterWrapper = $this->getAdapterWrapper();
-        if ($adapterWrapper) {
-            $bucketName = $this->getAmazonS3BucketName();
-            foreach ($pathMapping as $prefix => $localPath) {
-                $files = array_keys($adapterWrapper->getBucketContents($bucketName, $prefix));
-
-                $localPath = rtrim($localPath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
-                $this->downloadFiles($files, $prefix, $localPath);
-            }
+        if ($this->_cacheFacade === null) {
+            $cdnAdapter = $this->getCdnAdapter();
+            /** @var Aoe_AmazonCdn_Model_Cache $cacheModel */
+            $cacheModel = Mage::getSingleton('aoe_amazoncdn/cache');
+            $verifySize = Mage::getStoreConfigFlag(self::XPATH_CONFIG_CACHE_CHECK_SIZE);
+            $ttl        = Mage::getStoreConfig(self::XPATH_CONFIG_CACHE_TTL);
+            $this->_cacheFacade = new Aoe_AmazonCdn_Model_Cache_Facade($cdnAdapter, $cacheModel, $verifySize, $ttl);
         }
+
+        return $this->_cacheFacade;
     }
 
     /**
-     * Downloads multiple files from Amazon S3 bucket
+     * Get Amazon CDN adapter
      *
-     * @param array $files array containing full paths to files on s3
-     * @param string $prefix
-     * @param string $localPath
-     * @return array
+     * @return Aoe_AmazonCdn_Model_Cdn_Adapter
      */
-    public function downloadFiles($files, $prefix, $localPath)
+    public function getCdnAdapter()
     {
-        $downloadedFiles = array();
-        $adapterWrapper  = $this->getAdapterWrapper();
-        if ($adapterWrapper) {
-            $bucketName = $this->getAmazonS3BucketName();
-            $io         = new Varien_Io_File();
-            foreach ($files as $s3fileName) {
-                if (substr($s3fileName, 0, strlen($prefix)) == $prefix) {
-                    $file          = substr($s3fileName, strlen($prefix));
-                    $targetFile    = $localPath . $file;
-                    $directoryName = dirname($targetFile);
-                    if (!is_dir($directoryName)) {
-                        $res = $io->mkdir($directoryName);
-                        if ($res) {
-                            OnePica_ImageCdn_Helper_Data::log('Successfully created dir ' . $directoryName, Zend_Log::DEBUG);
-                        } else {
-                            OnePica_ImageCdn_Helper_Data::log('Error while creating dir ' . $directoryName, Zend_Log::ERR);
-                        }
-                    }
-                    if (!is_file($targetFile)) {
-                        $adapterWrapper->downloadFile($bucketName, $s3fileName, $targetFile);
-                        $downloadedFiles[] = $s3fileName;
-                        OnePica_ImageCdn_Helper_Data::log('Downloading file ' . $targetFile, Zend_Log::DEBUG);
-                    }
-                }
-            }
+        if ($this->_cdnAdapter === null) {
+            $bucket          = Mage::getStoreConfig(self::XPATH_CONFIG_BUCKET_NAME);
+            $accessKeyId     = Mage::getStoreConfig(self::XPATH_CONFIG_ACCESS_KEY_ID);
+            $secretAccessKey = Mage::getStoreConfig(self::XPATH_CONFIG_SECRET_ACCESS_KEY);
+            $this->_cdnAdapter = new Aoe_AmazonCdn_Model_Cdn_Adapter($bucket, $accessKeyId, $secretAccessKey);
         }
 
-        return $downloadedFiles;
+        return $this->_cdnAdapter;
     }
 
     /**
@@ -191,14 +171,7 @@ class Aoe_AmazonCdn_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function replaceWysiwygUrls($html)
     {
-        $adapter = $this->getAdapter();
-        if ($adapter) {
-            $html = preg_replace_callback('/"(http[^"]*\/media\/wysiwyg\/[^"]*)"/', array($this, '_replaceCallback'),
-                $html
-            );
-        }
-
-        return $html;
+        return preg_replace_callback('/"(http[^"]*\/media\/wysiwyg\/[^"]*)"/', array($this, '_replaceCallback'), $html);
     }
 
     /**
@@ -211,26 +184,27 @@ class Aoe_AmazonCdn_Helper_Data extends Mage_Core_Helper_Abstract
      */
     private function _replaceCallback($match)
     {
-        $file = $match[1];
+        $nativeUrl = $match[1];
 
-        $relative = preg_replace('/(.*)\/wysiwyg/', '/wysiwyg', $file);
-        $url      = $this->getCdnUrl($relative);
-
-        if (!$url) {
-            $localFile = Mage::getBaseDir('media') . $relative;
-            if (is_file($localFile)) {
-                $url = $this->storeInCdn($localFile);
-                if ($url) {
-                    OnePica_ImageCdn_Helper_Data::log(
-                        sprintf('Copied previously uploaded wysiwyg file "%s" to cdn. Url "%s"', $localFile, $url),
-                        Zend_Log::DEBUG
-                    );
-                } else {
-                    OnePica_ImageCdn_Helper_Data::log(sprintf('Did not copy uploaded wysiwyg file "%s" to cdn.', $localFile), Zend_Log::ERR);
-                }
+        $fileName = Mage::getBaseDir('media') . preg_replace('/(.*?)\/wysiwyg/', DS . 'wysiwyg', $nativeUrl);
+        $url      = $nativeUrl;
+        $cdnUrl   = $this->getCdnAdapter()->getUrl($fileName);
+        if ($this->getCacheFacade()->get($fileName)) {
+            $url = $cdnUrl;
+        } elseif (is_file($fileName)) {
+            if ($this->getCdnAdapter()->save($fileName, $fileName)) {
+                $url = $cdnUrl;
+                $this->getLogger()->log(
+                    sprintf('Copied previously uploaded wysiwyg file "%s" to cdn. Url "%s"', $fileName, $url),
+                    Zend_Log::DEBUG
+                );
             } else {
-                OnePica_ImageCdn_Helper_Data::log(sprintf('Could not find file "%s", neither local nor in cdn', $relative), Zend_Log::ERR);
+                $this->getLogger()
+                    ->log(sprintf('Did not copy uploaded wysiwyg file "%s" to cdn.', $fileName), Zend_Log::ERR);
             }
+        } else {
+            $this->getLogger()
+                ->log(sprintf('Could not find file "%s", neither local nor in cdn', $fileName), Zend_Log::ERR);
         }
 
         return '"' . $url . '"';

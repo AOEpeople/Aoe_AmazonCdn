@@ -1,4 +1,7 @@
 <?php
+/**
+ * @author Dmytro Zavalkin <dmytro.zavalkin@aoe.com>
+ */
 
 class Aoe_AmazonCdn_Model_Cms_Wysiwyg_Images_Storage extends Mage_Cms_Model_Wysiwyg_Images_Storage
 {
@@ -8,20 +11,29 @@ class Aoe_AmazonCdn_Model_Cms_Wysiwyg_Images_Storage extends Mage_Cms_Model_Wysi
     const CACHE_KEY_PREFIX_WYSIWYG = 's3download_wysiwyg_';
 
     /**
+     * Get helper
+     *
+     * @return Aoe_AmazonCdn_Helper_Data
+     */
+    protected function _getHelper()
+    {
+        return Mage::helper('aoe_amazoncdn');
+    }
+
+    /**
      * Update local files from S3
      */
     protected function _construct()
     {
-        $cacheKey     = self::CACHE_KEY_PREFIX_WYSIWYG . Mage::app()->getRequest()->getServer('SERVER_ADDR');
-        $lastSyncTime = (int)Mage::app()->loadCache($cacheKey);
+        if ($this->_getHelper()->isConfigured()) {
+            $cacheKey = self::CACHE_KEY_PREFIX_WYSIWYG . Mage::app()->getRequest()->getServer('SERVER_ADDR');
+            $lastSyncTime = (int) Mage::app()->loadCache($cacheKey);
 
-        if (time() - $lastSyncTime > 120) {
-            /* @var $helper Aoe_AmazonCdn_Helper_Data */
-            $helper = Mage::helper('aoe_amazoncdn');
-            $helper->downloadFolders(
-                array('media/wysiwyg/' => Mage::helper('cms/wysiwyg_images')->getStorageRoot())
-            );
-            Mage::app()->saveCache(time(), $cacheKey);
+            if (time() - $lastSyncTime > 120) {
+                $this->_getHelper()->getCdnAdapter()
+                    ->downloadFolder(Mage::helper('cms/wysiwyg_images')->getStorageRoot());
+                Mage::app()->saveCache(time(), $cacheKey);
+            }
         }
 
         parent::_construct();
@@ -36,20 +48,24 @@ class Aoe_AmazonCdn_Model_Cms_Wysiwyg_Images_Storage extends Mage_Cms_Model_Wysi
      */
     public function uploadFile($targetPath, $type = null)
     {
-        $result = parent::uploadFile($targetPath, $type);
+        if ($this->_getHelper()->isConfigured()) {
+            $logger = $this->_getHelper()->getLogger();
+            $result = parent::uploadFile($targetPath, $type);
 
-        // get image path
-        $path = rtrim($result['path'], DS) . DS . $result['file'];
+            // get image path
+            $fileName = rtrim($result['path'], DS) . DS . $result['file'];
+            if ($this->_getHelper()->getCdnAdapter()->save($fileName, $fileName)) {
+                $url = $this->_getHelper()->getCdnAdapter()->getUrl($fileName);
+                $logger->log(sprintf('Copied uploaded wysiwyg file "%s" to cdn. Url "%s"', $fileName, $url),
+                    Zend_Log::DEBUG
+                );
+            } else {
+                $logger->log(sprintf('Did not copy uploaded wysiwyg file "%s" to cdn.', $fileName), Zend_Log::ERR);
+            }
 
-        /* @var $helper Aoe_AmazonCdn_Helper_Data */
-        $helper = Mage::helper('aoe_amazoncdn');
-        $url = $helper->storeInCdn($path);
-        if ($url) {
-            OnePica_ImageCdn_Helper_Data::log(sprintf('Copied uploaded wysiwyg file "%s" to cdn. Url "%s"', $path, $url), Zend_Log::DEBUG);
+            return $result;
         } else {
-            OnePica_ImageCdn_Helper_Data::log(sprintf('Did not copy uploaded wysiwyg file "%s" to cdn.', $path), Zend_Log::ERR);
+            return parent::uploadFile($targetPath, $type);
         }
-
-        return $result;
     }
 }

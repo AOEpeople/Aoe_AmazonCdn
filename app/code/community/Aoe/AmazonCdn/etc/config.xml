@@ -1,16 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
+    <modules>
+        <Aoe_AmazonCdn>
+            <version>0.0.1</version>
+        </Aoe_AmazonCdn>
+    </modules>
+
     <global>
         <models>
             <aoe_amazoncdn>
                 <class>Aoe_AmazonCdn_Model</class>
+                <resourceModel>aoe_amazoncdn_resource</resourceModel>
             </aoe_amazoncdn>
+            <aoe_amazoncdn_resource>
+                <class>Aoe_AmazonCdn_Model_Resource</class>
+                <entities>
+                    <cache>
+                        <table>aoe_amazoncdn_cache</table>
+                    </cache>
+                </entities>
+            </aoe_amazoncdn_resource>
+            <catalog>
+                <rewrite>
+                    <product_image>Aoe_AmazonCdn_Model_Catalog_Product_Image</product_image>
+                    <category>Aoe_AmazonCdn_Model_Catalog_Category</category>
+                </rewrite>
+            </catalog>
             <cms>
                 <rewrite>
                     <wysiwyg_images_storage>Aoe_AmazonCdn_Model_Cms_Wysiwyg_Images_Storage</wysiwyg_images_storage>
                 </rewrite>
             </cms>
         </models>
+        <resources>
+            <aoe_amazoncdn_setup>
+                <setup>
+                    <module>Aoe_AmazonCdn</module>
+                </setup>
+            </aoe_amazoncdn_setup>
+        </resources>
 
         <helpers>
             <aoe_amazoncdn>
@@ -34,5 +62,65 @@
                 </rewrite>
             </enterprise_banner>
         </blocks>
+
+        <events>
+            <controller_action_postdispatch_adminhtml_catalog_product_gallery_upload>
+                <observers>
+                    <aoe_amazoncdn>
+                        <type>singleton</type>
+                        <class>aoe_amazoncdn/observer</class>
+                        <method>onGalleryUploadAction</method>
+                    </aoe_amazoncdn>
+                </observers>
+            </controller_action_postdispatch_adminhtml_catalog_product_gallery_upload>
+            <admin_system_config_changed_section_aoe_amazoncdn>
+                <observers>
+                    <aoe_amazoncdn>
+                        <type>singleton</type>
+                        <class>aoe_amazoncdn/observer</class>
+                        <method>onConfigChange</method>
+                    </aoe_amazoncdn>
+                </observers>
+            </admin_system_config_changed_section_aoe_amazoncdn>
+            <catalog_product_save_after>
+                <observers>
+                    <aoe_amazoncdn>
+                        <type>singleton</type>
+                        <class>aoe_amazoncdn/observer</class>
+                        <method>catalogProductModelSaveAfter</method>
+                    </aoe_amazoncdn>
+                </observers>
+            </catalog_product_save_after>
+            <catalog_category_save_after>
+                <observers>
+                    <aoe_amazoncdn>
+                        <type>singleton</type>
+                        <class>aoe_amazoncdn/observer</class>
+                        <method>catalogCategoryModelSaveAfter</method>
+                    </aoe_amazoncdn>
+                </observers>
+            </catalog_category_save_after>
+        </events>
     </global>
+
+    <crontab>
+        <jobs>
+            <aoe_amazoncdn>
+                <schedule><cron_expr>0 0 1 * *</cron_expr></schedule>
+                <run>
+                    <model>aoe_amazoncdn/observer::cleanCache</model>
+                </run>
+            </aoe_amazoncdn>
+        </jobs>
+    </crontab>
+
+    <default>
+        <aoe_amazoncdn>
+            <general>
+                <cache_check_size>1</cache_check_size>
+                <cache_ttl>1440</cache_ttl>
+                <debug_mode>0</debug_mode>
+            </general>
+        </aoe_amazoncdn>
+    </default>
 </config>

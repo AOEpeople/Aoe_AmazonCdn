@@ -1,0 +1,108 @@
+<?xml version="1.0"?>
+<config>
+    <sections>
+        <aoe_amazoncdn translate="label" module="aoe_amazoncdn">
+            <label>Aoe Amazon CDN</label>
+            <tab>catalog</tab>
+            <frontend_type>text</frontend_type>
+            <sort_order>980</sort_order>
+            <show_in_default>1</show_in_default>
+            <show_in_website>1</show_in_website>
+            <show_in_store>1</show_in_store>
+            <groups>
+                <general translate="label comment">
+                    <label>General Settings</label>
+                    <comment><![CDATA[<style type="text/css"> .op-note { font-size:11px; font-weight:bold; } </style>]]></comment>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>10</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <is_enabled translate="label comment">
+                            <label>Enable CDN integration</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>1</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <comment>If set to No - CDN integration will be disabled.</comment>
+                        </is_enabled>
+                        <cache_ttl translate="label comment">
+                            <label>Cache Time-to-Live</label>
+                            <comment>in minutes</comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>2</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </cache_ttl>
+                        <cache_check_size translate="label comment">
+                            <label>Verify File Size</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <comment>Simply ensures file size is greater than zero. May not work in rare cases.</comment>
+                            <sort_order>3</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </cache_check_size>
+                        <compression translate="label comment">
+                            <label>Image Compression</label>
+                            <comment><![CDATA[<p>1 is best quality/biggest file, 9 is worst quality/smaller</p><p>Compression is only available to jpeg and png formats. After changing this setting you may need to delete all of the previously created images on the remote server. This can easily be done by going to <code>System > Cache Management</code> and clicking on the <code>Clear</code> button next to <code>Image Cache</code>.</p>]]></comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>aoe_amazoncdn/source_compression</source_model>
+                            <sort_order>4</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </compression>
+                        <debug_mode translate="label comment">
+                            <label>Debug mode</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>5</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <comment>Stores debugging information in aoe_amazoncdn.log file</comment>
+                        </debug_mode>
+                    </fields>
+                </general>
+                <amazons3 translate="label comment">
+                    <label>Amazon S3/CloudFront</label>
+                    <comment><![CDATA[<span class="op-note">To use CloudFront, simply enter your CloudFront domain in the base URL fields instead.</span>]]></comment>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>20</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <access_key_id translate="label">
+                            <label>Access Key ID</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>1</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </access_key_id>
+                        <secret_access_key translate="label">
+                            <label>Secret Access Key</label>
+                            <frontend_type>password</frontend_type>
+                            <sort_order>2</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </secret_access_key>
+                        <bucket translate="label comment">
+                            <label>Bucket</label>
+                            <frontend_type>text</frontend_type>
+                            <comment>Must already be created and be dedicated for this Magento install only.</comment>
+                            <sort_order>3</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </bucket>
+                    </fields>
+                </amazons3>
+            </groups>
+        </aoe_amazoncdn>
+    </sections>
+</config>
