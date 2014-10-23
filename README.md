@@ -10,7 +10,7 @@ Add something like the following to your composer.json:
 ```json
 {
     "require": {
-        "aoe/amazon-cdn": "*"
+        "aoe/amazon-cdn": "~1.0.0"
     },
     "extra": {
         "magento-root-dir": "htdocs/"
