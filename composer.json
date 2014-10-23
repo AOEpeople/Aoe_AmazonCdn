@@ -12,6 +12,7 @@
     "require": {
         "magento-hackathon/magento-composer-installer": "*",
         "danslo/libraryrewrite": "*",
-        "firegento/psr0autoloader": "*"
+        "firegento/psr0autoloader": "*",
+        "aws/aws-sdk-php": "~2.7.1"
     }
 }

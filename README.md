@@ -24,6 +24,14 @@ Add something like the following to your composer.json:
         {
             "type": "vcs",
             "url": "https://github.com/danslo/LibraryRewrite.git"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/aws/aws-sdk-php.git"
+        },
+        {
+            "type": "composer",
+            "url": "http://packages.firegento.com"
         }
     ]
 }
@@ -40,7 +48,4 @@ Then issue the ``composer install`` command.
 
 ## TODO
 - Finish refactoring (merge Aoe_AmazonCdn_Model_Cache_Facade and Aoe_AmazonCdn_Model_Cdn_Adapter, better ideas?)
-- Switch from custom implementation of Amazon S3 interaction in Aoe_AmazonCdn_Model_Cdn_Connector
-and Aoe_AmazonCdn_Model_Cdn_Adapter to official Amazon SDK. Because custom implementation is less reliable then official
-SDK and can stop working basically at any time in the future
 - Tag all the things, to get rid of dev stability.

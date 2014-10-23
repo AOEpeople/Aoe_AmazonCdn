@@ -344,10 +344,14 @@ class Aoe_AmazonCdn_Model_Cdn_Adapter
         if ($this->_connector === null) {
             $error     = false;
             $connector = new Aoe_AmazonCdn_Model_Cdn_Connector($this->_accessKeyId, $this->_secretAccessKey);
-            $buckets   = $connector->listBuckets();
-            if ($buckets === false) {
-                $error = sprintf("Can't connect to Amazon S3 with auth key '%s'", $this->_accessKeyId);
-            } elseif (!in_array($this->_bucket, $buckets)) {
+
+            try {
+                $buckets = $connector->listBuckets();
+            } catch (Exception $e) {
+                $error = sprintf("Can't connect to Amazon S3 with auth key '%s': %s",
+                    $this->_accessKeyId, $e->getMessage());
+            }
+            if (!$error && !in_array($this->_bucket, $buckets)) {
                 $error = sprintf("Bucket '%s' doesn't exists or not enough rights to connect to it with auth key '%s'",
                     $this->_bucket, $this->_accessKeyId
                 );
