@@ -10,6 +10,7 @@
                 <Mage_Cms/>
                 <Mage_Core/>
                 <Danslo_LibraryRewrite />
+                <Hackathon_PSR0Autoloader />
             </depends>
         </Aoe_AmazonCdn>
     </modules>

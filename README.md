@@ -12,6 +12,7 @@ Add something like the following to your composer.json:
     "require": {
         "aoe/amazon-cdn": "*"
     },
+    "minimum-stability": "dev",
     "extra": {
         "magento-root-dir": "htdocs/"
     },
@@ -28,6 +29,13 @@ Add something like the following to your composer.json:
 }
 ```
 
+Load the composer autoloader into Magento if you haven't done so yet.
+You can do this by adding the following to ``<global />`` node of ``app/etc/local.xml``:
+
+```xml
+<composer_vendor_path><![CDATA[{{root_dir}}/vendor]]></composer_vendor_path>
+```
+
 Then issue the ``composer install`` command.
 
 ## TODO
@@ -35,3 +43,4 @@ Then issue the ``composer install`` command.
 - Switch from custom implementation of Amazon S3 interaction in Aoe_AmazonCdn_Model_Cdn_Connector
 and Aoe_AmazonCdn_Model_Cdn_Adapter to official Amazon SDK. Because custom implementation is less reliable then official
 SDK and can stop working basically at any time in the future
+- Tag all the things, to get rid of dev stability.

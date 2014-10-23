@@ -11,6 +11,7 @@
     ],
     "require": {
         "magento-hackathon/magento-composer-installer": "*",
-        "danslo/libraryrewrite": "*"
+        "danslo/libraryrewrite": "*",
+        "firegento/psr0autoloader": "*"
     }
 }
