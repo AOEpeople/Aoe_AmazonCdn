@@ -40,7 +40,7 @@ class Aoe_AmazonCdn_Model_Cdn_Adapter
      *
      * @var Aoe_AmazonCdn_Model_Cdn_Connector
      */
-    protected $_connector;
+    protected $_connector = null;
 
     /**
      * Bucket name
@@ -75,7 +75,6 @@ class Aoe_AmazonCdn_Model_Cdn_Adapter
         $this->_bucket          = $bucket;
         $this->_accessKeyId     = $accessKeyId;
         $this->_secretAccessKey = $secretAccessKey;
-        $this->_connector       = $this->_getConnector();
     }
 
     /**
@@ -98,7 +97,7 @@ class Aoe_AmazonCdn_Model_Cdn_Adapter
     public function save($filename, $tempFile)
     {
         $relativeFilename = $this->_getRelativePath($filename);
-        if ($this->_connector->uploadFile($this->_bucket, $relativeFilename, $tempFile, true)) {
+        if ($this->_getConnector()->uploadFile($this->_bucket, $relativeFilename, $tempFile, true)) {
             $this->_getHelper()->getCacheFacade()->add($filename, $tempFile);
             $message = sprintf('Successfully uploaded file "%s" ("%s") to bucket "%s"',
                 $relativeFilename,
@@ -129,7 +128,7 @@ class Aoe_AmazonCdn_Model_Cdn_Adapter
     public function remove($fileName)
     {
         $relativeFileName = $this->_getRelativePath($fileName);
-        if ($this->_connector->deleteObject($this->_bucket, $relativeFileName)) {
+        if ($this->_getConnector()->deleteObject($this->_bucket, $relativeFileName)) {
             $this->_getHelper()->getCacheFacade()->remove($fileName);
             $message = sprintf('Successfully deleted file "%s" from bucket "%s"', $relativeFileName,
                 $this->_bucket
@@ -228,7 +227,7 @@ class Aoe_AmazonCdn_Model_Cdn_Adapter
     {
         $path   = rtrim($path, DS) . DS;
         $prefix = $this->_getRelativePath($path);
-        $files  = $this->_connector->getBucketContents($this->_bucket, $prefix, true);
+        $files  = $this->_getConnector()->getBucketContents($this->_bucket, $prefix, true);
 
         $this->_downloadFiles($files, $prefix, $path);
     }
@@ -259,7 +258,7 @@ class Aoe_AmazonCdn_Model_Cdn_Adapter
                         }
                     }
                     if (!is_file($targetFile)) {
-                        $this->_connector->downloadFile($this->_bucket, $s3fileName, $targetFile);
+                        $this->_getConnector()->downloadFile($this->_bucket, $s3fileName, $targetFile);
                         $logger->log('Downloading file ' . $targetFile, Zend_Log::DEBUG);
                     }
                 }
@@ -334,27 +333,30 @@ class Aoe_AmazonCdn_Model_Cdn_Adapter
      */
     protected function _getConnector()
     {
-        $error     = false;
-        $connector = new Aoe_AmazonCdn_Model_Cdn_Connector($this->_accessKeyId, $this->_secretAccessKey);
-        $buckets   = $connector->listBuckets();
-        if ($buckets === false) {
-            $error = sprintf("Can't connect to Amazon S3 with auth key '%s'", $this->_accessKeyId);
-        } elseif (!in_array($this->_bucket, $buckets)) {
-            $error = sprintf("Bucket '%s' doesn't exists or not enough rights to connect to it with auth key '%s'",
-                $this->_bucket, $this->_accessKeyId
-            );
-        } else {
-            $this->_getHelper()->getLogger()->log(
-                sprintf("Successfully connected to bucket '%s' with auth key '%s'", $this->_bucket, $this->_accessKeyId)
-            );
+        if ($this->_connector === null) {
+            $error     = false;
+            $connector = new Aoe_AmazonCdn_Model_Cdn_Connector($this->_accessKeyId, $this->_secretAccessKey);
+            $buckets   = $connector->listBuckets();
+            if ($buckets === false) {
+                $error = sprintf("Can't connect to Amazon S3 with auth key '%s'", $this->_accessKeyId);
+            } elseif (!in_array($this->_bucket, $buckets)) {
+                $error = sprintf("Bucket '%s' doesn't exists or not enough rights to connect to it with auth key '%s'",
+                    $this->_bucket, $this->_accessKeyId
+                );
+            } else {
+                $this->_getHelper()->getLogger()->log(
+                    sprintf("Successfully connected to bucket '%s' with auth key '%s'", $this->_bucket, $this->_accessKeyId)
+                );
+            }
+
+            if ($error) {
+                $this->_getHelper()->getLogger()->log($error, Zend_Log::EMERG);
+                throw new InvalidArgumentException($error);
+            }
+            $this->_connector = $connector;
         }
 
-        if ($error) {
-            $this->_getHelper()->getLogger()->log($error, Zend_Log::EMERG);
-            throw new InvalidArgumentException($error);
-        }
-
-        return $connector;
+        return $this->_connector;
     }
 
     /**
@@ -365,7 +367,7 @@ class Aoe_AmazonCdn_Model_Cdn_Adapter
      */
     public function deleteFolder($folder)
     {
-        if ($this->_connector->deleteFolder($this->_bucket, $folder)) {
+        if ($this->_getConnector()->deleteFolder($this->_bucket, $folder)) {
             $this->_getHelper()->getLogger()->log(
                 sprintf('Deleted folder "%s" in bucket "%s"', $folder, $this->_bucket)
             );
