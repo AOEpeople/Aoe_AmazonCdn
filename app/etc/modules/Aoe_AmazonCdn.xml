@@ -9,6 +9,7 @@
                 <Mage_Catalog/>
                 <Mage_Cms/>
                 <Mage_Core/>
+                <Danslo_LibraryRewrite />
             </depends>
         </Aoe_AmazonCdn>
     </modules>
