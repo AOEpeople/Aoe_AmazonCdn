@@ -12,7 +12,6 @@ Add something like the following to your composer.json:
     "require": {
         "aoe/amazon-cdn": "*"
     },
-    "minimum-stability": "dev",
     "extra": {
         "magento-root-dir": "htdocs/"
     },
@@ -48,4 +47,3 @@ Then issue the ``composer install`` command.
 
 ## TODO
 - Finish refactoring (merge Aoe_AmazonCdn_Model_Cache_Facade and Aoe_AmazonCdn_Model_Cdn_Adapter, better ideas?)
-- Tag all the things, to get rid of dev stability.
