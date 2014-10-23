@@ -1,4 +1,18 @@
 <?php
+/**
+ * Aoe_AmazonCdn
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0), a
+ * copy of which is available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/osl-3.0.php
+ *
+ * @package    Aoe_AmazonCdn
+ * @author     Dmytro Zavalkin <dmytro.zavalkin@aoe.com>
+ * @copyright  Copyright (c) 2014 AOE, Inc.
+ * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ */
 
 // This is a fresh rewrite of the previous S3 class using PHP 5.
 // All transfers are done using PHP's native curl extension rather

@@ -1,25 +1,19 @@
 <?php
 /**
- * @author Dmytro Zavalkin <dmytro.zavalkin@aoe.com>
+ * Aoe_AmazonCdn
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0), a
+ * copy of which is available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/osl-3.0.php
+ *
+ * @package    Aoe_AmazonCdn
+ * @author     Dmytro Zavalkin <dmytro.zavalkin@aoe.com>
+ * @copyright  Copyright (c) 2014 AOE, Inc.
+ * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
 
-/**
- * Class Aoe_AmazonCdn_Model_Cache
- *
- * @method Aoe_AmazonCdn_Model_Resource_Cache _getResource()
- * @method string getUrl()
- * @method Aoe_AmazonCdn_Model_Cache setUrl(string $url)
- * @method int getFileType()
- * @method Aoe_AmazonCdn_Model_Cache setFileType(int $fileType)
- * @method string getLastChecked()
- * @method Aoe_AmazonCdn_Model_Cache setLastChecked(string $lastChecked)
- * @method int getImageWidth()
- * @method Aoe_AmazonCdn_Model_Cache setImageWidth(int $width)
- * @method int getImageHeight()
- * @method Aoe_AmazonCdn_Model_Cache setImageHeight(int $height)
- * @method int getImageType()
- * @method Aoe_AmazonCdn_Model_Cache setImageType(int $imageType)
- */
 class Aoe_AmazonCdn_Model_Cache extends Mage_Core_Model_Abstract
 {
     /**@+
