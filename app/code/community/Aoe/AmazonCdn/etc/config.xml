@@ -2,7 +2,7 @@
 <config>
     <modules>
         <Aoe_AmazonCdn>
-            <version>0.0.1</version>
+            <version>1.0.0</version>
         </Aoe_AmazonCdn>
     </modules>
 
@@ -12,7 +12,7 @@
                 <Varien_Io_File>Aoe_AmazonCdn</Varien_Io_File>
             </rewrite>
         </libraries>
-        
+
         <models>
             <aoe_amazoncdn>
                 <class>Aoe_AmazonCdn_Model</class>
