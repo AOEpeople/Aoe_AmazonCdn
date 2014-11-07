@@ -14,23 +14,26 @@
  * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
 
-class Aoe_AmazonCdn_Block_Page extends Mage_Cms_Block_Page
+class Varien_Io_File extends Magento\Varien_Io_File
 {
-    /**
-     * Prepare Content HTML
-     *
-     * @return string
-     */
-    protected function _toHtml()
-    {
-        $html = parent::_toHtml();
 
-        /* @var $helper Aoe_AmazonCdn_Helper_Data */
-        $helper = Mage::helper('aoe_amazoncdn');
-        if ($helper->isConfigured()) {
-            return $helper->replaceWysiwygUrls($html);
-        } else {
-            return $html;
+    /**
+     * Check source is file.
+     *
+     * @param string $src
+     * @return bool
+     */
+    protected function _checkSrcIsFile($src)
+    {
+        $result = false;
+
+        // Fix for bug in core:
+        // both is_readable() and is_file() emit E_WARNING if there is a null byte in $src
+        if (is_string($src) && @is_readable($src) && @is_file($src)) {
+            $result = true;
         }
+
+        return $result;
     }
+
 }

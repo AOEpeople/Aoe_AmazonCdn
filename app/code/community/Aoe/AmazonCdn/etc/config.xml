@@ -7,6 +7,12 @@
     </modules>
 
     <global>
+        <libraries>
+            <rewrite>
+                <Varien_Io_File>Aoe_AmazonCdn</Varien_Io_File>
+            </rewrite>
+        </libraries>
+        
         <models>
             <aoe_amazoncdn>
                 <class>Aoe_AmazonCdn_Model</class>

@@ -1,0 +1,18 @@
+{
+    "name": "aoe/amazon-cdn",
+    "type": "magento-module",
+    "license": "OSL-3.0",
+    "description": "Onepica_ImageCdn fork focused purely on S3 with some customizations and improvements.",
+    "authors": [
+        {
+            "name":"Dmytro Zavalkin",
+            "email":"dmytro.zavalkin@aoe.com"
+        }
+    ],
+    "require": {
+        "magento-hackathon/magento-composer-installer": "~2.0.0",
+        "danslo/libraryrewrite": "~1.0.0",
+        "firegento/psr0autoloader": "*@dev",
+        "aws/aws-sdk-php": "~2.7.1"
+    }
+}
