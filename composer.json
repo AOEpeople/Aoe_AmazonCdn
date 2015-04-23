@@ -1,0 +1,16 @@
+{
+    "name": "aoepeople/aoe_amazoncdn",
+    "license": "GPL-3.0",
+    "type": "magento-module",
+    "description": "AWS S3 Support for Magento",
+    "require": {
+        "magento-hackathon/magento-composer-installer": "*"
+    },
+    "authors":[
+        {
+            "name":"Dmytro Zavalkin",
+            "email":"dmytro.zavalkin@aoe.com"
+        }
+    ]
+}
+
