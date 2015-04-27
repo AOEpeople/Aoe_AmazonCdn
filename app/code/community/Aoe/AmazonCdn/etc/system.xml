@@ -23,15 +23,31 @@
                             <label>Enable CDN integration</label>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
-                            <sort_order>1</sort_order>
+                            <sort_order>10</sort_order>
                             <show_in_default>1</show_in_default>
                             <comment>If set to No - CDN integration will be disabled.</comment>
                         </is_enabled>
+                        <store_cache_remotely translate="label comment">
+                            <label>Store Cached Images Remotely</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <comment><![CDATA[Upload cached (resized) image remotely]]></comment>
+                        </store_cache_remotely>
+                        <store_cache_locally translate="label comment">
+                            <label>Store Cached Images Locally</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <comment><![CDATA[Keep cached (resized) images stored locally (in "media/catalog/product/cache")]]></comment>
+                        </store_cache_locally>
                         <cache_ttl translate="label comment">
                             <label>Cache Time-to-Live</label>
                             <comment>in minutes</comment>
                             <frontend_type>text</frontend_type>
-                            <sort_order>2</sort_order>
+                            <sort_order>40</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -40,8 +56,8 @@
                             <label>Verify File Size</label>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
-                            <comment>Simply ensures file size is greater than zero. May not work in rare cases.</comment>
-                            <sort_order>3</sort_order>
+                            <comment><![CDATA[Simply ensures file size is greater than zero. May not work in rare cases.]]></comment>
+                            <sort_order>50</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -51,7 +67,7 @@
                             <comment><![CDATA[<p>1 is best quality/biggest file, 9 is worst quality/smaller</p><p>Compression is only available to jpeg and png formats. After changing this setting you may need to delete all of the previously created images on the remote server. This can easily be done by going to <code>System > Cache Management</code> and clicking on the <code>Clear</code> button next to <code>Image Cache</code>.</p>]]></comment>
                             <frontend_type>select</frontend_type>
                             <source_model>aoe_amazoncdn/source_compression</source_model>
-                            <sort_order>4</sort_order>
+                            <sort_order>60</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -60,7 +76,7 @@
                             <label>Debug mode</label>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
-                            <sort_order>5</sort_order>
+                            <sort_order>70</sort_order>
                             <show_in_default>1</show_in_default>
                             <comment>Stores debugging information in aoe_amazoncdn.log file</comment>
                         </debug_mode>

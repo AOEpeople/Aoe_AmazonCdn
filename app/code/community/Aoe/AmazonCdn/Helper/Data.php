@@ -5,20 +5,21 @@
 
 class Aoe_AmazonCdn_Helper_Data extends Mage_Core_Helper_Abstract
 {
-    /**@+
+    /**
      * Config paths to retrieve Aoe_AmazonCdn settings
      *
      * @var string
      */
-    const XPATH_CONFIG_IS_ENABLED        = 'aoe_amazoncdn/general/is_enabled';
-    const XPATH_CONFIG_CACHE_CHECK_SIZE  = 'aoe_amazoncdn/general/cache_check_size';
-    const XPATH_CONFIG_CACHE_TTL         = 'aoe_amazoncdn/general/cache_ttl';
-    const XPATH_CONFIG_COMPRESSION       = 'aoe_amazoncdn/general/compression';
-    const XPATH_CONFIG_DEBUG_MODE        = 'aoe_amazoncdn/general/debug_mode';
-    const XPATH_CONFIG_BUCKET_NAME       = 'aoe_amazoncdn/amazons3/bucket';
-    const XPATH_CONFIG_ACCESS_KEY_ID     = 'aoe_amazoncdn/amazons3/access_key_id';
-    const XPATH_CONFIG_SECRET_ACCESS_KEY = 'aoe_amazoncdn/amazons3/secret_access_key';
-    /**@-*/
+    const XPATH_CONFIG_IS_ENABLED           = 'aoe_amazoncdn/general/is_enabled';
+    const XPATH_CONFIG_CACHE_CHECK_SIZE     = 'aoe_amazoncdn/general/cache_check_size';
+    const XPATH_CONFIG_CACHE_TTL            = 'aoe_amazoncdn/general/cache_ttl';
+    const XPATH_CONFIG_COMPRESSION          = 'aoe_amazoncdn/general/compression';
+    const XPATH_CONFIG_DEBUG_MODE           = 'aoe_amazoncdn/general/debug_mode';
+    const XPATH_CONFIG_STORE_CACHE_REMOTELY = 'aoe_amazoncdn/general/store_cache_remotely';
+    const XPATH_CONFIG_STORE_CACHE_LOCALLY  = 'aoe_amazoncdn/general/store_cache_locally';
+    const XPATH_CONFIG_BUCKET_NAME          = 'aoe_amazoncdn/amazons3/bucket';
+    const XPATH_CONFIG_ACCESS_KEY_ID        = 'aoe_amazoncdn/amazons3/access_key_id';
+    const XPATH_CONFIG_SECRET_ACCESS_KEY    = 'aoe_amazoncdn/amazons3/secret_access_key';
 
     /**
      * General on/off switcher

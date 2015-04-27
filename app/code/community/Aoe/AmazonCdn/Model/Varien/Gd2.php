@@ -68,9 +68,11 @@ class Aoe_AmazonCdn_Model_Varien_Gd2 extends Varien_Image_Adapter_Gd2
      */
     public function save($destination = null, $newName = null)
     {
+
         if (!$this->_imageHandler) {
             $this->_downloadAndOpenRemoteFile();
         }
+
 
         $temp = tempnam(sys_get_temp_dir(), 'cds');
         parent::save($temp);
@@ -103,20 +105,30 @@ class Aoe_AmazonCdn_Model_Varien_Gd2 extends Varien_Image_Adapter_Gd2
             $filename = $this->_fileSrcPath . $this->_fileSrcName;
         }
 
-        if ($this->_getHelper()->getCdnAdapter()->save($filename, $temp)) {
-            @unlink($temp);
-        } else {
+        if (Mage::getStoreConfig(Aoe_AmazonCdn_Helper_Data::XPATH_CONFIG_STORE_CACHE_REMOTELY)) {
+            if (!$this->_getHelper()->getCdnAdapter()->save($filename, $temp)) {
+                @unlink($temp);
+                throw new Exception("Unable to upload file '{$filename}' to CDN.");
+            }
+        }
+
+        if (Mage::getStoreConfig(Aoe_AmazonCdn_Helper_Data::XPATH_CONFIG_STORE_CACHE_LOCALLY)) {
             if (!is_writable($destination)) {
                 try {
                     $io = new Varien_Io_File();
                     $io->mkdir($destination);
                 } catch (Exception $e) {
+                    @unlink($temp);
                     throw new Exception("Unable to write file into directory '{$destination}'. Access forbidden.");
                 }
             }
-            @rename($temp, $filename);
-            @chmod($filename, 0644);
+            if (!copy($temp, $filename)) {
+                throw new Exception("Unable to copy temp image '{$temp}' to '{$filename}'");
+            }
+            chmod($filename, 0664);
         }
+
+        @unlink($temp);
     }
 
     /**

@@ -117,6 +117,7 @@
     <default>
         <aoe_amazoncdn>
             <general>
+                <store_cache_remotely>1</store_cache_remotely>
                 <cache_check_size>1</cache_check_size>
                 <cache_ttl>1440</cache_ttl>
                 <debug_mode>0</debug_mode>

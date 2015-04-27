@@ -92,8 +92,7 @@ class Aoe_AmazonCdn_Model_Catalog_Product_Image extends Mage_Catalog_Model_Produ
             }
             if (!$file) {
                 // check if placeholder defined in config
-                $isConfigPlaceholder
-                                   = Mage::getStoreConfig("catalog/placeholder/{$this->getDestinationSubdir()}_placeholder");
+                $isConfigPlaceholder = Mage::getStoreConfig("catalog/placeholder/{$this->getDestinationSubdir()}_placeholder");
                 $configPlaceholder = '/placeholder/' . $isConfigPlaceholder;
                 if ($isConfigPlaceholder && $this->_fileExists($baseDir . $configPlaceholder)) {
                     $file = $configPlaceholder;
