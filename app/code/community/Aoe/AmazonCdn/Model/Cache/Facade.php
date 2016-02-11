@@ -1,8 +1,8 @@
 <?php
+
 /**
  * @author Dmytro Zavalkin <dmytro.zavalkin@aoe.com>
  */
-
 class Aoe_AmazonCdn_Model_Cache_Facade
 {
     /**
@@ -47,12 +47,13 @@ class Aoe_AmazonCdn_Model_Cache_Facade
      * @param float $cacheTtl
      */
     public function __construct(Aoe_AmazonCdn_Model_Cdn_Adapter $adapter, Aoe_AmazonCdn_Model_Cache $cacheModel,
-        $verifySize, $cacheTtl
-    ) {
+                                $verifySize, $cacheTtl
+    )
+    {
         $this->_cdnAdapter = $adapter;
         $this->_cacheModel = $cacheModel;
         $this->_verifySize = (bool)$verifySize;
-        $this->_cacheTtl   = (float)$cacheTtl;
+        $this->_cacheTtl = (float)$cacheTtl;
     }
 
     /**
@@ -67,7 +68,7 @@ class Aoe_AmazonCdn_Model_Cache_Facade
             return self::$_cache[$filename];
         }
 
-        $url        = $this->_cdnAdapter->getUrl($filename);
+        $url = $this->_cdnAdapter->getUrl($filename);
         $cachedInDb = $this->_cacheModel->get($url);
 
         if (!$cachedInDb) {
@@ -75,8 +76,8 @@ class Aoe_AmazonCdn_Model_Cache_Facade
         }
 
         $ttlSeconds = $this->_cacheTtl * 60;
-        $cacheTtl   = rand(intval($ttlSeconds * 0.9), intval($ttlSeconds * 1.1));
-        $maxTime    = $cachedInDb['last_checked'] + $cacheTtl * 60;
+        $cacheTtl = rand(intval($ttlSeconds * 0.9), intval($ttlSeconds * 1.1));
+        $maxTime = $cachedInDb['last_checked'] + $cacheTtl * 60;
 
         if (time() < $maxTime) {
             self::$_cache[$filename] = $cachedInDb;
