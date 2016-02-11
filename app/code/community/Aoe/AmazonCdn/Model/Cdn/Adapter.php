@@ -328,33 +328,13 @@ class Aoe_AmazonCdn_Model_Cdn_Adapter
     }
 
     /**
-     * Verify Amazon CDN credentials
+     * Get connector
      *
      * @return Aoe_AmazonCdn_Model_Cdn_Connector
      */
     protected function _getConnector()
     {
-        $error     = false;
-        $connector = new Aoe_AmazonCdn_Model_Cdn_Connector($this->_accessKeyId, $this->_secretAccessKey);
-        $buckets   = $connector->listBuckets();
-        if ($buckets === false) {
-            $error = sprintf("Can't connect to Amazon S3 with auth key '%s'", $this->_accessKeyId);
-        } elseif (!in_array($this->_bucket, $buckets)) {
-            $error = sprintf("Bucket '%s' doesn't exists or not enough rights to connect to it with auth key '%s'",
-                $this->_bucket, $this->_accessKeyId
-            );
-        } else {
-            $this->_getHelper()->getLogger()->log(
-                sprintf("Successfully connected to bucket '%s' with auth key '%s'", $this->_bucket, $this->_accessKeyId)
-            );
-        }
-
-        if ($error) {
-            $this->_getHelper()->getLogger()->log($error, Zend_Log::EMERG);
-            throw new InvalidArgumentException($error);
-        }
-
-        return $connector;
+        return new Aoe_AmazonCdn_Model_Cdn_Connector($this->_accessKeyId, $this->_secretAccessKey);
     }
 
     /**
@@ -388,10 +368,8 @@ class Aoe_AmazonCdn_Model_Cdn_Adapter
         $mediaCacheFolder = $this->_getRelativePath(Mage::getBaseDir('media') . self::CACHE_DIRECTORY_MEDIA);
         if ($this->deleteFolder($mediaCacheFolder)) {
             $this->_getHelper()->getCacheFacade()->flushImages();
-
             return true;
         }
-
         return false;
     }
 
@@ -406,10 +384,8 @@ class Aoe_AmazonCdn_Model_Cdn_Adapter
         $jsCacheFolder = $this->_getRelativePath(Mage::getBaseDir('media') . self::CACHE_DIRECTORY_JS);
         if ($this->deleteFolder($cssCacheFolder) && $this->deleteFolder($jsCacheFolder)) {
             $this->_getHelper()->getCacheFacade()->flushCssJs();
-
             return true;
         }
-
         return false;
     }
 

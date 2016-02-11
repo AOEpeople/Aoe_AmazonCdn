@@ -70,17 +70,17 @@ class Aoe_AmazonCdn_Model_Cache_Facade
         $url        = $this->_cdnAdapter->getUrl($filename);
         $cachedInDb = $this->_cacheModel->get($url);
 
-        if ($cachedInDb) {
-            $ttlSeconds = $this->_cacheTtl * 60;
-            $cacheTtl   = rand(intval($ttlSeconds * 0.9), intval($ttlSeconds * 1.1));
-            $maxTime    = $cachedInDb['last_checked'] + $cacheTtl * 60;
+        if (!$cachedInDb) {
+            return $this->_fileExistsOnRemote($filename);
+        }
 
-            if (time() < $maxTime) {
-                self::$_cache[$filename] = $cachedInDb;
-                return $cachedInDb;
-            } else {
-                return $this->_fileExistsOnRemote($filename);
-            }
+        $ttlSeconds = $this->_cacheTtl * 60;
+        $cacheTtl   = rand(intval($ttlSeconds * 0.9), intval($ttlSeconds * 1.1));
+        $maxTime    = $cachedInDb['last_checked'] + $cacheTtl * 60;
+
+        if (time() < $maxTime) {
+            self::$_cache[$filename] = $cachedInDb;
+            return $cachedInDb;
         } else {
             return $this->_fileExistsOnRemote($filename);
         }

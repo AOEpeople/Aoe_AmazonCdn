@@ -253,40 +253,6 @@ class Aoe_AmazonCdn_Model_Cdn_Connector
         return Mage::helper('aoe_amazoncdn');
     }
 
-    public function listBuckets()
-    {
-        $request = array('verb' => 'GET', 'resource' => '/');
-        $result  = $this->sendRequest($request);
-        $xml     = simplexml_load_string($result);
-
-        if ($xml === false || !isset($xml->Buckets->Bucket)) {
-            return false;
-        }
-
-        $buckets = array();
-        foreach ($xml->Buckets->Bucket as $bucket) {
-            $buckets[] = (string)$bucket->Name;
-        }
-
-        return $buckets;
-    }
-
-    public function createBucket($name)
-    {
-        $request = array('verb' => 'PUT', 'resource' => "/$name/");
-        $this->sendRequest($request);
-
-        return $this->curlInfo['http_code'] == '200';
-    }
-
-    public function deleteBucket($name)
-    {
-        $request = array('verb' => 'DELETE', 'resource' => "/$name/");
-        $this->sendRequest($request);
-
-        return $this->curlInfo['http_code'] == '204';
-    }
-
     public function getBucketLocation($name)
     {
         $request = array('verb' => 'GET', 'resource' => "/$name/?location");

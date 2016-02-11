@@ -27,23 +27,23 @@ class Aoe_AmazonCdn_Model_Catalog_Category extends Mage_Catalog_Model_Category
      */
     public function getImageUrl()
     {
-        if ($this->_getHelper()->isConfigured()) {
-            $filename = false;
-            if ($image = $this->getImage()) {
-                $filename = Mage::getBaseDir('media') . '/catalog/category/' . $image;
-            }
-
-            if ($filename) {
-                if (!$this->_getHelper()->getCacheFacade()->get($filename)) {
-                    $this->_getHelper()->getCdnAdapter()->save($filename, $filename);
-                }
-                $url = $this->_getHelper()->getCdnAdapter()->getUrl($filename);
-                if ($url) {
-                    return $url;
-                }
-            }
+        if (!$this->_getHelper()->isConfigured()) {
+            return parent::getImageUrl();
         }
 
-        return parent::getImageUrl();
+        $filename = false;
+        if ($image = $this->getImage()) {
+            $filename = Mage::getBaseDir('media') . '/catalog/category/' . $image;
+        }
+
+        if ($filename) {
+            if (!$this->_getHelper()->getCacheFacade()->get($filename)) {
+                $this->_getHelper()->getCdnAdapter()->save($filename, $filename);
+            }
+            $url = $this->_getHelper()->getCdnAdapter()->getUrl($filename);
+            if ($url) {
+                return $url;
+            }
+        }
     }
 }
