@@ -22,14 +22,13 @@
  */
 class Aoe_AmazonCdn_Model_Cache extends Mage_Core_Model_Abstract
 {
-    /**@+
+    /**
      * File types
      *
      * @var int
      */
     const FILE_TYPE_IMAGE  = 0;
     const FILE_TYPE_CSS_JS = 1;
-    /**@-*/
 
     /**
      * Internal constructor not depended on params
@@ -50,16 +49,16 @@ class Aoe_AmazonCdn_Model_Cache extends Mage_Core_Model_Abstract
         $this->unsetData();
         $this->load($url, 'url');
 
-        if ($this->getId()) {
-            return array(
-                'image_width'  => $this->getImageWidth(),
-                'image_height' => $this->getImageHeight(),
-                'image_type'   => $this->getImageType(),
-                'last_checked' => strtotime($this->getLastChecked())
-            );
-        } else {
+        if (!$this->getId()) {
             return false;
         }
+
+        return array(
+            'image_width'  => $this->getImageWidth(),
+            'image_height' => $this->getImageHeight(),
+            'image_type'   => $this->getImageType(),
+            'last_checked' => strtotime($this->getLastChecked())
+        );
     }
 
     /**
@@ -110,10 +109,8 @@ class Aoe_AmazonCdn_Model_Cache extends Mage_Core_Model_Abstract
         $this->load($url, 'url');
         if ($this->getId()) {
             $this->delete();
-
             return true;
         }
-
         return false;
     }
 

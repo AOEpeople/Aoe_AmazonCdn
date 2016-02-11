@@ -46,9 +46,7 @@ class Aoe_AmazonCdn_Model_Cache_Facade
      * @param bool $verifySize
      * @param float $cacheTtl
      */
-    public function __construct(Aoe_AmazonCdn_Model_Cdn_Adapter $adapter, Aoe_AmazonCdn_Model_Cache $cacheModel,
-                                $verifySize, $cacheTtl
-    )
+    public function __construct(Aoe_AmazonCdn_Model_Cdn_Adapter $adapter, Aoe_AmazonCdn_Model_Cache $cacheModel, $verifySize, $cacheTtl)
     {
         $this->_cdnAdapter = $adapter;
         $this->_cacheModel = $cacheModel;
@@ -97,10 +95,8 @@ class Aoe_AmazonCdn_Model_Cache_Facade
     {
         if ($this->_cdnAdapter->fileExistOnRemote($filename, $this->_verifySize)) {
             self::$_cache[$filename] = true;
-
             return true;
         }
-
         return false;
     }
 

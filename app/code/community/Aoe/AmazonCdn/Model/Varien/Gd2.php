@@ -209,9 +209,7 @@ class Aoe_AmazonCdn_Model_Varien_Gd2 extends Varien_Image_Adapter_Gd2
         parent::rotate($angle);
     }
 
-    public function watermark($watermarkImage, $positionX = 0, $positionY = 0, $watermarkImageOpacity = 30,
-        $repeat = false
-    )
+    public function watermark($watermarkImage, $positionX = 0, $positionY = 0, $watermarkImageOpacity = 30, $repeat = false)
     {
         $this->_downloadAndOpenRemoteFile();
         parent::watermark($watermarkImage, $positionX, $positionY, $watermarkImageOpacity, $repeat);
@@ -219,7 +217,7 @@ class Aoe_AmazonCdn_Model_Varien_Gd2 extends Varien_Image_Adapter_Gd2
 
     public function  __destruct()
     {
-        if ($this->_imageHandler) {
+        if ($this->_imageHandler && method_exists('Varien_Image_Adapter_Gd2', '__destruct')) {
             parent::__destruct();
         }
     }

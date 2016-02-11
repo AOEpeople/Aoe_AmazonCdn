@@ -6,7 +6,6 @@
 $fixMediaUrls = function ($content) {
     $updatedContent = str_replace("{media url='/", "{media url='", $content);
     $updatedContent = str_replace('{media url="/', '{media url="', $updatedContent);
-
     return $updatedContent;
 };
 

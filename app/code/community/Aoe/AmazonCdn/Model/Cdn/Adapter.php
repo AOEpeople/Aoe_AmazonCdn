@@ -8,7 +8,7 @@
  */
 class Aoe_AmazonCdn_Model_Cdn_Adapter
 {
-    /**@+
+    /**
      * Cache directories (relative to Mage::getBaseDir('media')
      *
      * @see Mage_Catalog_Model_Product_Image::clearCache()
@@ -17,9 +17,8 @@ class Aoe_AmazonCdn_Model_Cdn_Adapter
      * @var string
      */
     const CACHE_DIRECTORY_MEDIA = '/catalog/product/cache/';
-    const CACHE_DIRECTORY_CSS   = '/css/';
-    const CACHE_DIRECTORY_JS    = '/js/';
-    /**@-*/
+    const CACHE_DIRECTORY_CSS = '/css/';
+    const CACHE_DIRECTORY_JS = '/js/';
 
     /**
      * The maximum number of seconds to allow cURL functions to execute
@@ -50,20 +49,6 @@ class Aoe_AmazonCdn_Model_Cdn_Adapter
     protected $_bucket;
 
     /**
-     * Amazon access key
-     *
-     * @var string
-     */
-    protected $_accessKeyId;
-
-    /**
-     * Amazon secret key
-     *
-     * @var string
-     */
-    protected $_secretAccessKey;
-
-    /**
      * Class constructor
      *
      * @param string $bucket
@@ -72,10 +57,8 @@ class Aoe_AmazonCdn_Model_Cdn_Adapter
      */
     public function __construct($bucket, $accessKeyId, $secretAccessKey)
     {
-        $this->_bucket          = $bucket;
-        $this->_accessKeyId     = $accessKeyId;
-        $this->_secretAccessKey = $secretAccessKey;
-        $this->_connector       = $this->_getConnector();
+        $this->_bucket = $bucket;
+        $this->_connector = new Aoe_AmazonCdn_Model_Cdn_Connector($accessKeyId, $secretAccessKey);
     }
 
     /**
@@ -131,17 +114,13 @@ class Aoe_AmazonCdn_Model_Cdn_Adapter
         $relativeFileName = $this->_getRelativePath($fileName);
         if ($this->_connector->deleteObject($this->_bucket, $relativeFileName)) {
             $this->_getHelper()->getCacheFacade()->remove($fileName);
-            $message = sprintf('Successfully deleted file "%s" from bucket "%s"', $relativeFileName,
-                $this->_bucket
-            );
+            $message = sprintf('Successfully deleted file "%s" from bucket "%s"', $relativeFileName, $this->_bucket);
             $this->_getHelper()->getLogger()->log($message);
-
             return true;
         } else {
             $message = sprintf('Failed removing file "%s" from bucket "%s"', $relativeFileName, $this->_bucket);
             $this->_getHelper()->getLogger()->log($message, Zend_Log::CRIT);
         }
-
         return false;
     }
 
@@ -154,9 +133,8 @@ class Aoe_AmazonCdn_Model_Cdn_Adapter
      */
     protected function _getRelativePath($fileName)
     {
-        $base     = str_replace('\\', '/', Mage::getBaseDir());
+        $base = str_replace('\\', '/', Mage::getBaseDir());
         $fileName = str_replace('\\', '/', $fileName);
-
         return ltrim(str_replace($base, '', $fileName), '/');
     }
 
@@ -174,7 +152,6 @@ class Aoe_AmazonCdn_Model_Cdn_Adapter
         $curlAdapter->addOption(CURLOPT_RETURNTRANSFER, true);
         $curlAdapter->addOption(CURLOPT_FOLLOWLOCATION, $this->_curlFollowLocation);
         $curlAdapter->addOption(CURLOPT_SSL_VERIFYPEER, false);
-
         return $curlAdapter;
     }
 
@@ -189,7 +166,6 @@ class Aoe_AmazonCdn_Model_Cdn_Adapter
     {
         $logger = $this->_getHelper()->getLogger();
         $url = $this->getUrl($filename);
-        $logger->log(sprintf('Full url on remote for "%s" local file is: "%s"', $filename, $url));
 
         $curlAdapter = $this->_createdCurlAdapterWithDefaultOptions($url);
         $curlAdapter->addOption(CURLOPT_HEADER, true);
@@ -198,25 +174,17 @@ class Aoe_AmazonCdn_Model_Cdn_Adapter
         $curlAdapter->connect(null)->read();
 
         $httpCode = $curlAdapter->getInfo(CURLINFO_HTTP_CODE);
-        $size     = $curlAdapter->getInfo(CURLINFO_CONTENT_LENGTH_DOWNLOAD);
+        $size = $curlAdapter->getInfo(CURLINFO_CONTENT_LENGTH_DOWNLOAD);
 
         $curlAdapter->close();
 
         if ($httpCode == 200 && (!$verifySize || $size)) {
-            $logger->log(
-                sprintf('Check if file "%s" exists: Found on remote.', $filename)
-            );
-            $result = true;
-        } else {
-            $logger->log(
-                sprintf('Check if file "%s" exists: File not found on remote. (HTTP status code: %s)', $filename,
-                    $httpCode
-                )
-            );
-            $result = false;
+            $logger->log(sprintf('[FOUND] %s', $url));
+            return true;
         }
 
-        return $result;
+        $logger->log(sprintf('[NOT FOUND] %s', $url));
+        return false;
     }
 
     /**
@@ -226,9 +194,9 @@ class Aoe_AmazonCdn_Model_Cdn_Adapter
      */
     public function downloadFolder($path)
     {
-        $path   = rtrim($path, DS) . DS;
+        $path = rtrim($path, DS) . DS;
         $prefix = $this->_getRelativePath($path);
-        $files  = $this->_connector->getBucketContents($this->_bucket, $prefix, true);
+        $files = $this->_connector->getBucketContents($this->_bucket, $prefix, true);
 
         $this->_downloadFiles($files, $prefix, $path);
     }
@@ -243,13 +211,13 @@ class Aoe_AmazonCdn_Model_Cdn_Adapter
     protected function _downloadFiles($files, $prefix, $localPath)
     {
         $logger = $this->_getHelper()->getLogger();
-        $io     = new Varien_Io_File();
+        $io = new Varien_Io_File();
         foreach ($files as $s3fileName) {
             if (substr($s3fileName, 0, strlen($prefix)) == $prefix) {
                 // skip folders (which ends with /)
                 if (substr($s3fileName, -1) != '/') {
-                    $file          = substr($s3fileName, strlen($prefix));
-                    $targetFile    = $localPath . $file;
+                    $file = substr($s3fileName, strlen($prefix));
+                    $targetFile = $localPath . $file;
                     $directoryName = dirname($targetFile);
                     if (!is_dir($directoryName)) {
                         if ($io->mkdir($directoryName)) {
@@ -303,38 +271,22 @@ class Aoe_AmazonCdn_Model_Cdn_Adapter
         $fileContent = $curlAdapter->connect(null)->read();
 
         $httpCode = $curlAdapter->getInfo(CURLINFO_HTTP_CODE);
-        $size     = $curlAdapter->getInfo(CURLINFO_CONTENT_LENGTH_DOWNLOAD);
+        $size = $curlAdapter->getInfo(CURLINFO_CONTENT_LENGTH_DOWNLOAD);
 
         if ($httpCode == 200 && $size) {
-            $logger->log(
-                sprintf('Downloading file "%s" from remote: Downloaded from remote.', $filename)
-            );
+            $logger->log(sprintf('Downloading file "%s" from remote: Downloaded from remote.', $filename));
             $result = true;
 
             $this->_writeFile($filename, $fileContent);
             $this->_getHelper()->getCacheFacade()->add($filename);
         } else {
-            $logger->log(
-                sprintf('Downloading file "%s" from remote: File not found on remote. (HTTP status code: %s)',
-                    $filename, $httpCode
-                )
-            );
+            $logger->log(sprintf('Downloading file "%s" from remote: File not found on remote. (HTTP status code: %s)', $filename, $httpCode));
             $result = false;
         }
 
         $curlAdapter->close();
 
         return $result;
-    }
-
-    /**
-     * Get connector
-     *
-     * @return Aoe_AmazonCdn_Model_Cdn_Connector
-     */
-    protected function _getConnector()
-    {
-        return new Aoe_AmazonCdn_Model_Cdn_Connector($this->_accessKeyId, $this->_secretAccessKey);
     }
 
     /**
@@ -346,17 +298,11 @@ class Aoe_AmazonCdn_Model_Cdn_Adapter
     public function deleteFolder($folder)
     {
         if ($this->_connector->deleteFolder($this->_bucket, $folder)) {
-            $this->_getHelper()->getLogger()->log(
-                sprintf('Deleted folder "%s" in bucket "%s"', $folder, $this->_bucket)
-            );
-
+            $this->_getHelper()->getLogger()->log(sprintf('Deleted folder "%s" in bucket "%s"', $folder, $this->_bucket));
             return true;
         } else {
-            $this->_getHelper()->getLogger()->log(
-                sprintf('Unable to delete folder "%s" in bucket "%s"', $folder, $this->_bucket)
-            );
+            $this->_getHelper()->getLogger()->log(sprintf('Unable to delete folder "%s" in bucket "%s"', $folder, $this->_bucket));
         }
-
         return false;
     }
 
@@ -401,20 +347,17 @@ class Aoe_AmazonCdn_Model_Cdn_Adapter
         $jsBaseDir = Mage::getBaseDir() . DS . 'js';
         if (strpos($filename, $jsBaseDir) === 0) {
             $path = str_replace($jsBaseDir . DS, "", $filename);
-
             return Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_JS) . str_replace(DS, '/', $path);
         }
 
         $skinBaseDir = Mage::getBaseDir('skin');
         if (strpos($filename, $skinBaseDir) === 0) {
             $path = str_replace($skinBaseDir . DS, "", $filename);
-
             return Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_SKIN) . str_replace(DS, '/', $path);
         }
 
         $mediaBaseDir = Mage::getBaseDir('media');
-        $path    = str_replace($mediaBaseDir . DS, "", $filename);
-
+        $path = str_replace($mediaBaseDir . DS, "", $filename);
         return Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA) . str_replace(DS, '/', $path);
     }
 }

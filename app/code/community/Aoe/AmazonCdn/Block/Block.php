@@ -14,8 +14,7 @@ class Aoe_AmazonCdn_Block_Block extends Mage_Cms_Block_Block
     {
         $html = parent::_toHtml();
 
-        /* @var $helper Aoe_AmazonCdn_Helper_Data */
-        $helper = Mage::helper('aoe_amazoncdn');
+        $helper = Mage::helper('aoe_amazoncdn'); /* @var $helper Aoe_AmazonCdn_Helper_Data */
         if ($helper->isConfigured()) {
             return $helper->replaceWysiwygUrls($html);
         } else {
