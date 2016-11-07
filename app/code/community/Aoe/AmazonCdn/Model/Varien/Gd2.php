@@ -52,7 +52,7 @@ class Aoe_AmazonCdn_Model_Varien_Gd2 extends Varien_Image_Adapter_Gd2
         $cachedData  = $this->_getHelper()->getCacheFacade()->get($filename);
         if ($cachedData && is_array($cachedData)) {
             $this->_fileInCache    = true;
-            $this->_fileType       = $cachedData['image_type'];
+            $this->_fileType       = (int)$cachedData['image_type'];
             $this->_fileMimeType   = image_type_to_mime_type($this->_fileType);
             $this->_imageSrcWidth  = $cachedData['image_width'];
             $this->_imageSrcHeight = $cachedData['image_height'];
